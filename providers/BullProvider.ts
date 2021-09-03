@@ -30,7 +30,7 @@ export default class BullProvider {
     const BullManager = this.app.container.use('Rocketseat/Bull')
     const jobs = require(this.app.startPath('jobs'))?.default || []
     jobs.forEach((job) => {
-      BullManager.addJob(job)
+      BullManager.addProcessor(job)
     })
   }
 
