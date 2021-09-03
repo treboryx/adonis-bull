@@ -38,36 +38,12 @@ export class BullManager implements BullManagerContract {
       return this._queues
     }
 
-    this._queues = this.jobs.reduce((queues, path) => {
-      const jobDefinition: JobContract = this.container.make(path)
-
-      const queueConfig: QueueOptions = {
-        connection: this.config.connections[this.config.connection],
-        defaultJobOptions: jobDefinition.options,
-        ...jobDefinition.queueOptions,
-      }
-
-      const jobListeners = this._getEventListener(jobDefinition)
-
-      // eslint-disable-next-line no-new
-      new QueueScheduler(jobDefinition.key, queueConfig)
-
-      queues[jobDefinition.key] = Object.freeze({
-        bull: new Queue(jobDefinition.key, queueConfig),
-        ...jobDefinition,
-        instance: jobDefinition,
-        listeners: jobListeners,
-        boot: jobDefinition.boot,
-      })
-
-      return queues
-    }, {})
-
+    this._queues = {}
     return this.queues
   }
 
   public addProcessor(key: string, job: JobContract) {
-    if (!this._queues[key]) {
+    if (!this.queues[key]) {
       const queueConfig: QueueOptions = {
         connection: this.config.connections[this.config.connection],
         defaultJobOptions: job.options,
@@ -79,7 +55,7 @@ export class BullManager implements BullManagerContract {
       // eslint-disable-next-line no-new
       new QueueScheduler(job.key, queueConfig)
 
-      this._queues[job.key] = Object.freeze({
+      this.queues[job.key] = Object.freeze({
         bull: new Queue(job.key, queueConfig),
         ...job,
         instance: job,
