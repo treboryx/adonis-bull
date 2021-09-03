@@ -29,8 +29,9 @@ export default class BullProvider {
   public async boot() {
     const BullManager = this.app.container.use('Rocketseat/Bull')
     const jobs = require(this.app.startPath('jobs'))?.default || []
-    jobs.forEach((job) => {
-      BullManager.addProcessor(job)
+    jobs.forEach((path) => {
+      const job = this.app.container.make(path)
+      BullManager.addProcessor(job.key, job)
     })
   }
 
