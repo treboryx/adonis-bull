@@ -18,9 +18,11 @@ import {
   Worker,
   WorkerOptions,
   Processor,
+  WorkerListener,
 } from 'bullmq'
-import * as BullBoard from 'bull-board'
-import { BullMQAdapter } from 'bull-board/bullMQAdapter'
+import { createBullBoard } from '@bull-board/api'
+import { ExpressAdapter } from '@bull-board/express'
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter'
 
 export class BullManager implements BullManagerContract {
   constructor(
@@ -72,7 +74,10 @@ export class BullManager implements BullManagerContract {
       if (method.startsWith('on')) {
         const eventName = method
           .replace(/^on(\w)/, (_, group) => group.toLowerCase())
-          .replace(/([A-Z]+)/, (_, group) => ` ${group.toLowerCase()}`)
+          .replace(
+            /([A-Z]+)/,
+            (_, group) => ` ${group.toLowerCase()}`
+          ) as keyof WorkerListener
 
         events.push({ eventName, method })
       }
@@ -117,13 +122,15 @@ export class BullManager implements BullManagerContract {
 
   /* istanbul ignore next */
   public ui(port = 9999) {
-    const board = BullBoard.createBullBoard(
-      Object.keys(this.queues).map(
+    const serverAdapter = new ExpressAdapter()
+    createBullBoard({
+      queues: Object.keys(this.queues).map(
         (key) => new BullMQAdapter(this.getByKey(key).bull)
-      )
-    )
+      ),
+      serverAdapter: serverAdapter,
+    })
 
-    const server = board.router.listen(port, () => {
+    const server = serverAdapter.getRouter().listen(port, () => {
       this.Logger.info(`bull board on http://localhost:${port}`)
     })
 

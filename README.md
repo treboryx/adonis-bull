@@ -1,5 +1,7 @@
 <br />
 
+Credits to [ROCKETSEAT](https://github.com/Rocketseat/adonis-bull) for the original implementation
+
 <img width="275" alt="Adonis Bull" src="https://user-images.githubusercontent.com/16545335/71373449-f2146880-2595-11ea-8a8c-9f51384a3f22.png">
 
 <h2>A <a href="https://github.com/taskforcesh/bullmq">Bull</a> provider for <a href="https://adonisjs.com/">AdonisJS</a> </br>
@@ -22,23 +24,23 @@ Adonis Bull provides an easy way to start using Bull.
 - [Why](#why)
 - [Getting Started](#getting-started)
 - [Setup](#setup)
-  * [Connections](#connections)
+  - [Connections](#connections)
 - [Initialization](#initialization)
-  * [ace command](#ace-command)
-  * [http server](#http-server)
+  - [ace command](#ace-command)
+  - [http server](#http-server)
 - [Usage](#usage)
-  * [Creating your job](#creating-your-job)
-  * [Events](#events)
-  * [Processing the jobs](#processing-the-jobs)
-  * [Simple job](#simple-job)
-  * [Scheduled job](#scheduled-job)
-    + [Other ways of using schedule](#other-ways-of-using-schedule)
-    + [Using schedule with a third party lib](#using-schedule-with-a-third-party-lib)
-  * [Advanced jobs](#advanced-jobs)
-  * [Exceptions](#exceptions)
+  - [Creating your job](#creating-your-job)
+  - [Events](#events)
+  - [Processing the jobs](#processing-the-jobs)
+  - [Simple job](#simple-job)
+  - [Scheduled job](#scheduled-job)
+    - [Other ways of using schedule](#other-ways-of-using-schedule)
+    - [Using schedule with a third party lib](#using-schedule-with-a-third-party-lib)
+  - [Advanced jobs](#advanced-jobs)
+  - [Exceptions](#exceptions)
 - [Contributing](#contributing)
-  * [Contribution Guidelines](#contribution-guidelines)
-  * [Code of Conduct](#code-of-conduct)
+  - [Contribution Guidelines](#contribution-guidelines)
+  - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
 ## Why
@@ -52,13 +54,13 @@ Let's start by installing the package in our project.
 **Yarn**:
 
 ```sh
-yarn add @rocketseat/adonis-bull@alpha
+yarn add @rowboat/adonis-bull@alpha
 ```
 
 **NPM**:
 
 ```sh
-npm install @rocketseat/adonis-bull@alpha
+npm install @rowboat/adonis-bull@alpha
 ```
 
 ## Setup
@@ -66,7 +68,7 @@ npm install @rocketseat/adonis-bull@alpha
 You can configure the project by running the following command:
 
 ```sh
-node ace invoke @rocketseat/adonis-bull
+node ace invoke @rowboat/adonis-bull
 ```
 
 When prompted, you must choose between two start options: `ace command` or `http server`.
@@ -138,7 +140,7 @@ node ace make:job userRegisterEmail
 This command will generate a file at `app/Jobs` and add the created job at `start/jobs.ts`.
 
 ```ts
-const jobs = ["App/Jobs/UserRegisterEmail"]
+const jobs = ['App/Jobs/UserRegisterEmail']
 
 export default jobs
 ```
@@ -153,16 +155,16 @@ export default class UserRegisterEmail implements JobContract {
   public key = 'UserRegisterEmail'
 
   public async handle(job) {
-    const { data } = job; // the 'data' variable has user data
+    const { data } = job // the 'data' variable has user data
 
-    await Mail.send("emails.welcome", data, message => {
+    await Mail.send('emails.welcome', data, (message) => {
       message
         .to(data.email)
-        .from("<from-email>")
-        .subject("Welcome to yardstick");
-    });
+        .from('<from-email>')
+        .subject('Welcome to yardstick')
+    })
 
-    return data;
+    return data
   }
 }
 ```
@@ -213,11 +215,10 @@ import Bull from '@ioc:Rocketseat/Bull'
 import Job from 'App/Jobs/UserRegisterEmail'
 
 export default class UserController {
-  store ({ request, response }) {
+  store({ request, response }) {
     const data = request.only(['email', 'name', 'password'])
 
     const user = await User.create(data)
-
 
     Bull.add(new Job().key, user)
   }
@@ -236,7 +237,7 @@ import Job from 'App/Jobs/UserRegisterEmail'
 import parseISO from 'date-fns/parseISO'
 
 export default class HolidayOnSaleController {
-  store ({ request, response }) {
+  store({ request, response }) {
     const data = request.only(['date', 'product_list']) // 2020-11-06T12:00:00
 
     const products = await ProductOnSale.create(data)
@@ -253,8 +254,8 @@ If a date has already passed, an error will occur.
 #### Other ways of using schedule
 
 ```ts
-Bull.schedule(key, data, new Date("2019-11-15 12:00:00"));
-Bull.schedule(key, data, 60 * 1000); // 1 minute from now.
+Bull.schedule(key, data, new Date('2019-11-15 12:00:00'))
+Bull.schedule(key, data, 60 * 1000) // 1 minute from now.
 ```
 
 #### Using schedule with a third party lib
@@ -262,7 +263,7 @@ Bull.schedule(key, data, 60 * 1000); // 1 minute from now.
 ```ts
 import humanInterval from 'human-interval'
 
-Bull.schedule(key, data, humanInterval("2 hours")); // 2 hours from now
+Bull.schedule(key, data, humanInterval('2 hours')) // 2 hours from now
 ```
 
 ### Advanced jobs
@@ -272,9 +273,9 @@ You can use the own `Bull` configs to improve your job:
 ```ts
 Bull.add(key, data, {
   repeat: {
-    cron: "0 30 12 * * WED,FRI"
-  }
-});
+    cron: '0 30 12 * * WED,FRI',
+  },
+})
 ```
 
 This `job` will run at 12:30 PM, on Wednesdays and Fridays.
@@ -301,19 +302,19 @@ import Sentry from 'App/Services/Sentry'
 const isDevelopment = Env.get('NODE_ENV') === 'development'
 
 export default class JobExceptionHandler extends BullExceptionHandler {
-  constructor () {
+  constructor() {
     super(Logger)
   }
 
-  public async handle (error: Error, job: Job) {
+  public async handle(error: Error, job: Job) {
     if (isDevelopment) {
       this.logger.error(`key=${job.name} id=${job.id} error=${error.message}`)
     } else {
-      Sentry.configureScope(scope => {
-        scope.setExtra(job);
-      });
+      Sentry.configureScope((scope) => {
+        scope.setExtra(job)
+      })
 
-      Sentry.captureException(error);
+      Sentry.captureException(error)
     }
   }
 }
@@ -335,8 +336,8 @@ We expect you to follow our [Code of Conduct](/.github/CODE_OF_CONDUCT.md). You 
 
 MIT License © [Rocketseat](https://github.com/Rocketseat)
 
-[npm-image]: https://img.shields.io/npm/v/@rocketseat/adonis-bull/alpha?color=8257E5&style=for-the-badge
-[npm-url]: https://www.npmjs.com/package/@rocketseat/adonis-bull/v/alpha 'npm'
+[npm-image]: https://img.shields.io/npm/v/@rowboat/adonis-bull/alpha?color=8257E5&style=for-the-badge
+[npm-url]: https://www.npmjs.com/package/@rowboat/adonis-bull/v/alpha 'npm'
 [license-url]: LICENSE.md
 [license-image]: https://img.shields.io/github/license/adonisjs/adonis-framework?color=8257E5&style=for-the-badge
 [build-url]: https://github.com/Rocketseat/adonis-bull/actions

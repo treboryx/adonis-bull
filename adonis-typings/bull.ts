@@ -47,7 +47,7 @@ declare module '@ioc:Rocketseat/Bull' {
   }
 
   export interface EventListener {
-    eventName: string
+    eventName: keyof Bullmq.WorkerListener
     method: string
   }
 

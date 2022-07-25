@@ -19,7 +19,7 @@ Although this list cannot be exhaustive, we explicitly honor diversity in age, g
 
 ### Reporting Issues
 
-If you experience or witness unacceptable behavior—or have any other concerns—please report it by contacting us via [opensource@rocketseat.com.br](mailto:opensource@rocketseat.com.br). All reports will be handled with discretion. In your report please include:
+If you experience or witness unacceptable behavior—or have any other concerns—please report it by contacting us via [opensource@rowboat.com.br](mailto:opensource@rowboat.com.br). All reports will be handled with discretion. In your report please include:
 
 - Your contact information.
 - Names (real, nicknames, or pseudonyms) of any individuals involved. If there are additional witnesses, please include them as well. Your account of what occurred, and if you believe the incident is ongoing. If there is a publicly available record, please include a link.
