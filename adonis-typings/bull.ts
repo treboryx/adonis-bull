@@ -77,6 +77,9 @@ declare module '@ioc:Rocketseat/Bull' {
 
     remove(name: string, jobId: string): Promise<void>
 
+    pause(name: string): Promise<void>
+    resume(name: string): Promise<void>
+
     ui(port?: number): void
 
     shutdown(): Promise<void>

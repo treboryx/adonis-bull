@@ -120,6 +120,16 @@ export class BullManager implements BullManagerContract {
     return job?.remove()
   }
 
+  public async pause(key: string): Promise<void> {
+    const job = await this.getByKey(key).bull.pause()
+    return job
+  }
+
+  public async resume(key: string): Promise<void> {
+    const job = await this.getByKey(key).bull.resume()
+    return job
+  }
+
   /* istanbul ignore next */
   public ui(port = 9999) {
     const serverAdapter = new ExpressAdapter()
