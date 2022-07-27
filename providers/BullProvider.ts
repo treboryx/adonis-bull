@@ -1,43 +1,51 @@
 import { ApplicationContract } from '@ioc:Adonis/Core/Application'
-
+import { Application } from '@adonisjs/application'
 /**
  * Provider to bind bull to the container
  */
 export default class BullProvider {
-  constructor(protected app: ApplicationContract) {}
+  public static needsApplication: boolean = true
+
+  protected container: ApplicationContract['container']
+
+  constructor(protected app: Application) {
+    this.container = app.container
+  }
 
   public register() {
-    this.app.container.bind('Rocketseat/Bull/BullExceptionHandler', () => {
-      const { BullExceptionHandler } = require('../src/BullExceptionHandler')
-      return BullExceptionHandler
-    })
+    if (this.app.environment === 'web') {
+      this.container.bind('Rocketseat/Bull/BullExceptionHandler', () => {
+        const { BullExceptionHandler } = require('../src/BullExceptionHandler')
+        return BullExceptionHandler
+      })
 
-    this.app.container.singleton('Rocketseat/Bull', () => {
-      const config = this.app.container
-        .use('Adonis/Core/Config')
-        .get('bull', {})
-      const Logger = this.app.container.use('Adonis/Core/Logger')
+      this.container.singleton('Rocketseat/Bull', () => {
+        const config = this.container.use('Adonis/Core/Config').get('bull', {})
+        const Logger = this.container.use('Adonis/Core/Logger')
 
-      const { BullManager } = require('../src/BullManager')
+        const { BullManager } = require('../src/BullManager')
 
-      return new BullManager(this.app.container, Logger, config, [])
-    })
+        return new BullManager(this.container, Logger, config, [])
+      })
 
-    this.app.container.alias('Rocketseat/Bull', 'Bull')
+      this.container.alias('Rocketseat/Bull', 'Bull')
+    }
   }
 
   public async boot() {
-    const BullManager = this.app.container.use('Rocketseat/Bull')
-    const jobs = require(this.app.startPath('jobs'))?.default || []
-    jobs.forEach((path) => {
-      const job = this.app.container.make(path)
-      BullManager.addProcessor(job.key, job)
-    })
+    if (this.app.environment === 'web') {
+      const BullManager = this.container.use('Rocketseat/Bull')
+      const jobs = require(this.app.startPath('jobs'))?.default || []
+      jobs.forEach((path) => {
+        const job = this.container.make(path)
+        BullManager.addProcessor(job.key, job)
+      })
+    }
   }
 
   public async shutdown() {
-    await this.app.container
-      .use<'Rocketseat/Bull'>('Rocketseat/Bull')
-      .shutdown()
+    if (this.app.environment === 'web') {
+      await this.container.use<'Rocketseat/Bull'>('Rocketseat/Bull').shutdown()
+    }
   }
 }

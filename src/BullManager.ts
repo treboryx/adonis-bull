@@ -130,6 +130,18 @@ export class BullManager implements BullManagerContract {
     return job
   }
 
+  public async obliterate(key: string) {
+    try {
+      await this.getByKey(key).bull.obliterate()
+      await this.getByKey(key).bull.clean(0, 99999)
+      this.Logger.info(`Obliterated queue ${key}`)
+      return true
+    } catch (error) {
+      this.Logger.error(error)
+      return false
+    }
+  }
+
   /* istanbul ignore next */
   public ui(port = 9999) {
     const serverAdapter = new ExpressAdapter()

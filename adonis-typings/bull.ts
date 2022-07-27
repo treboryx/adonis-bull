@@ -80,6 +80,8 @@ declare module '@ioc:Rocketseat/Bull' {
     pause(name: string): Promise<void>
     resume(name: string): Promise<void>
 
+    obliterate(name: string): Promise<boolean>
+
     ui(port?: number): void
 
     shutdown(): Promise<void>
