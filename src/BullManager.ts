@@ -12,7 +12,6 @@ import {
 
 import {
   Queue,
-  QueueScheduler,
   JobsOptions,
   Job as BullJob,
   Worker,
@@ -53,9 +52,6 @@ export class BullManager implements BullManagerContract {
       }
 
       const jobListeners = this._getEventListener(job)
-
-      // eslint-disable-next-line no-new
-      new QueueScheduler(job.key, queueConfig)
 
       this.queues[job.key] = Object.freeze({
         bull: new Queue(job.key, queueConfig),
