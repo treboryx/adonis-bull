@@ -106,9 +106,6 @@
     "type": "git",
     "url": "git+https://github.com/rocketseat/adonis-bull.git"
   },
-  "peerDependencies": {
-    "@adonisjs/core": "^5.0.4-preview-rc"
-  },
   "dependencies": {
     "@bull-board/express": "^4.6.2",
     "bull-board": "^2.0.3",
